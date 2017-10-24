@@ -73,6 +73,4 @@ public class Task implements java.io.Serializable {
     public void setUserId(long userId) {
         this.userId = userId;
     }
-    
-    
 }
