@@ -88,7 +88,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="nameLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&#x424;&#x418;&#x41e;"/>
+        <Property name="text" type="java.lang.String" value="&#x424;&#x418;&#x41e;*"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="nameTextField">

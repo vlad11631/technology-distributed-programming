@@ -1,53 +1,56 @@
 package com.view.tableModel;
 
-import com.models.Task;
-import com.models.TasksList;
-import com.models.User;
-import com.models.UsersList;
+import com.model.Task;
+import com.model.TasksList;
+import com.model.User;
+import com.model.UsersList;
 import java.text.DateFormat;
 import java.util.Locale;
 import javax.swing.table.DefaultTableModel;
 
 public class TasksTableModel extends DefaultTableModel {
-   
-    private final String[] headers = new String[] {
+
+    private final String[] headers = new String[]{
         "Название",
         "Описание",
         "Дата создания",
         "Дата окончания",
         "Исполнитель"
-    }; 
-    private DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, new Locale("ru","RU")); 
+    };
+    private DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, new Locale("ru", "RU"));
     private TasksList tasksList;
     private UsersList usersList;
-    
-    public TasksTableModel() {  
+
+    public TasksTableModel() {
     }
-    
+
     public TasksTableModel(TasksList tasksList, UsersList usersList) {
-       this.tasksList = tasksList;
-       this.usersList = usersList;
+        this.tasksList = tasksList;
+        this.usersList = usersList;
     }
-    
+
     @Override
     public int getRowCount() {
-        if (tasksList != null) return tasksList.size();
-        else return 0;
+        if (tasksList != null) {
+            return tasksList.size();
+        } else {
+            return 0;
+        }
     }
 
     @Override
     public int getColumnCount() {
         return headers.length;
     }
-    
+
     @Override
     public String getColumnName(int column) {
         return headers[column];
     }
-    
+
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return false; 
+        return false;
     }
 
     @Override
@@ -61,10 +64,10 @@ public class TasksTableModel extends DefaultTableModel {
             case 2:
                 return dateFormat.format(task.getCreatedDate());
             case 3:
-                return dateFormat.format(task.getEndDate());
+                return (task.getEndDate() != null) ? dateFormat.format(task.getEndDate()) : "";
             case 4:
                 User user = usersList.getUserById(task.getUserId());
-                return (user != null ) ? user.getName() : "";
+                return (user != null) ? user.getName() : "";
             default:
                 return "";
         }

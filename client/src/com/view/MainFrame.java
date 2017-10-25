@@ -1,23 +1,29 @@
 package com.view;
 
-import com.models.Task;
-import com.models.User;
+import com.model.Task;
+import com.model.User;
 import com.controller.Storage;
 import com.view.tableModel.UsersTableModel;
 import com.view.tableModel.TasksTableModel;
 import java.awt.Frame;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 public class MainFrame extends javax.swing.JFrame {
     
-    Storage storage;
+    UsersTableModel usersTableModel;
+    TasksTableModel tasksTableModel;
 
     public MainFrame() {
         initComponents();
         
-        storage = Storage.getInstance();
-        usersTable.setModel(new UsersTableModel(storage.getUsersList()));
-        tasksTable.setModel(new TasksTableModel(storage.getTasksList(), storage.getUsersList()));
+        Storage storage = Storage.getInstance();
+        usersTableModel = new UsersTableModel(storage.getUsersList());
+        tasksTableModel = new TasksTableModel(storage.getTasksList(), storage.getUsersList());
+        usersTable.setModel(usersTableModel);
+        tasksTable.setModel(tasksTableModel);
     }
 
     /**
@@ -44,7 +50,9 @@ public class MainFrame extends javax.swing.JFrame {
         deleteUserButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        saveMenuItem = new javax.swing.JMenuItem();
+        loadMenuItem = new javax.swing.JMenuItem();
+        exitMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -88,7 +96,7 @@ public class MainFrame extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 530, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addGap(30, 30, 30)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(addTaskButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(editTaskButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -150,7 +158,7 @@ public class MainFrame extends javax.swing.JFrame {
             usersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(usersPanelLayout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 530, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addGap(30, 30, 30)
                 .addGroup(usersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(addUserButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(editUserButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -160,24 +168,43 @@ public class MainFrame extends javax.swing.JFrame {
         usersPanelLayout.setVerticalGroup(
             usersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(usersPanelLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(usersPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(addUserButton)
                 .addGap(18, 18, 18)
                 .addComponent(editUserButton)
                 .addGap(18, 18, 18)
                 .addComponent(deleteUserButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(238, Short.MAX_VALUE))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
 
         jTabbedPane.addTab("Исполнители", usersPanel);
 
         jMenu1.setText("Меню");
 
-        jMenuItem1.setText("Выход");
-        jMenu1.add(jMenuItem1);
+        saveMenuItem.setText("Сохранение");
+        saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(saveMenuItem);
+
+        loadMenuItem.setText("Загрузка");
+        loadMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(loadMenuItem);
+
+        exitMenuItem.setText("Выход");
+        exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(exitMenuItem);
 
         jMenuBar1.add(jMenu1);
 
@@ -201,21 +228,17 @@ public class MainFrame extends javax.swing.JFrame {
         TaskDialog dialog = new TaskDialog(new Frame(), true);
         dialog.showDialog(null);
         
-        tasksTable.setModel(new TasksTableModel(storage.getTasksList(), storage.getUsersList()));
-        tasksTable.revalidate();
-        tasksTable.repaint();
+        tasksTableModel.fireTableDataChanged();
     }//GEN-LAST:event_addTaskButtonActionPerformed
 
     private void editTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editTaskButtonActionPerformed
         int index = tasksTable.getSelectedRow();
         if (index >= 0) {
-            Task task = Storage.getInstance().getTasksList().get(index);
+            Task task = Storage.getInstance().getTask(index);
             TaskDialog dialog = new TaskDialog(new Frame(), true);
             dialog.showDialog(task);
             
-            tasksTable.setModel(new TasksTableModel(storage.getTasksList(), storage.getUsersList()));
-            tasksTable.revalidate();
-            tasksTable.repaint();
+            tasksTableModel.fireTableDataChanged();
         } else {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите задачу", "Wrong values", JOptionPane.ERROR_MESSAGE);
         }
@@ -224,11 +247,9 @@ public class MainFrame extends javax.swing.JFrame {
     private void deleteTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteTaskButtonActionPerformed
         int index = tasksTable.getSelectedRow();
         if (index >= 0) {
-            Storage.getInstance().getTasksList().remove(index);
+            Storage.getInstance().removeTask(index);
             
-            tasksTable.setModel(new TasksTableModel(storage.getTasksList(), storage.getUsersList()));
-            tasksTable.revalidate();
-            tasksTable.repaint();
+            tasksTableModel.fireTableDataChanged();
         } else {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите задачу", "Wrong values", JOptionPane.ERROR_MESSAGE);
         }
@@ -238,21 +259,17 @@ public class MainFrame extends javax.swing.JFrame {
         UserDialog dialog = new UserDialog(new Frame(), true);
         dialog.showDialog(null);
         
-        usersTable.setModel(new UsersTableModel(storage.getUsersList()));
-        usersTable.revalidate();
-        usersTable.repaint();
+        usersTableModel.fireTableDataChanged();
     }//GEN-LAST:event_addUserButtonActionPerformed
 
     private void editUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editUserButtonActionPerformed
         int index = usersTable.getSelectedRow();
         if (index >= 0) {
-            User user = Storage.getInstance().getUsersList().get(index);
+            User user = Storage.getInstance().getUser(index);
             UserDialog dialog = new UserDialog(new Frame(), true);
             dialog.showDialog(user);
             
-            usersTable.setModel(new UsersTableModel(storage.getUsersList()));
-            usersTable.revalidate();
-            usersTable.repaint();
+            usersTableModel.fireTableDataChanged();
         } else {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите исполнителя", "Wrong values", JOptionPane.ERROR_MESSAGE);
         }
@@ -261,15 +278,55 @@ public class MainFrame extends javax.swing.JFrame {
     private void deleteUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteUserButtonActionPerformed
         int index = usersTable.getSelectedRow();
         if (index >= 0) {
-            Storage.getInstance().getUsersList().remove(index);
+            Storage.getInstance().removeUser(index);
             
-            usersTable.setModel(new UsersTableModel(storage.getUsersList()));
-            usersTable.revalidate();
-            usersTable.repaint();
+            usersTableModel.fireTableDataChanged();
         } else {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите исполнителя", "Wrong values", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_deleteUserButtonActionPerformed
+
+    private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMenuItemActionPerformed
+        JFileChooser chooserFile = new JFileChooser();
+        chooserFile.setDialogType(JFileChooser.SAVE_DIALOG);
+        if (chooserFile.showSaveDialog(chooserFile) == JFileChooser.APPROVE_OPTION) {
+            try {
+                Storage.saveStorage(chooserFile.getSelectedFile().getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Ошибка сохранения", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_saveMenuItemActionPerformed
+
+    private void loadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadMenuItemActionPerformed
+        JFileChooser chooserFile = new JFileChooser();
+        chooserFile.setDialogType(JFileChooser.OPEN_DIALOG);
+        if (chooserFile.showOpenDialog(chooserFile) == JFileChooser.APPROVE_OPTION) {
+            try {
+                Storage.loadStorage(chooserFile.getSelectedFile().getAbsolutePath());
+                
+                Storage storage = Storage.getInstance();
+                usersTableModel = new UsersTableModel(storage.getUsersList());
+                tasksTableModel = new TasksTableModel(storage.getTasksList(), storage.getUsersList());
+                usersTable.setModel(usersTableModel);
+                tasksTable.setModel(tasksTableModel);
+                tasksTableModel.fireTableDataChanged();
+                usersTableModel.fireTableDataChanged();
+                
+            } catch (FileNotFoundException e) {
+                JOptionPane.showMessageDialog(this, "Файл не найден", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Файл не открыт", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (ClassNotFoundException e) {
+                JOptionPane.showMessageDialog(this, "Файл не открыт", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_loadMenuItemActionPerformed
+
+    private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_exitMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -313,13 +370,15 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton deleteUserButton;
     private javax.swing.JButton editTaskButton;
     private javax.swing.JButton editUserButton;
+    private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane;
+    private javax.swing.JMenuItem loadMenuItem;
+    private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JTable tasksTable;
     private javax.swing.JPanel usersPanel;
     private javax.swing.JTable usersTable;
