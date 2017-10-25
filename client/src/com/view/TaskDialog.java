@@ -1,8 +1,8 @@
 package com.view;
 
 import com.controller.Storage;
-import com.model.Task;
-import com.model.User;
+import com.models.Task;
+import com.models.User;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;

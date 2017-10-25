@@ -1,10 +1,10 @@
 package com.controller;
 
 import java.util.Date;
-import com.model.TasksList;
-import com.model.UsersList;
-import com.model.Task;
-import com.model.User;
+import com.models.TasksList;
+import com.models.UsersList;
+import com.models.Task;
+import com.models.User;
 
 
 public class Storage implements java.io.Serializable{
@@ -22,7 +22,7 @@ public class Storage implements java.io.Serializable{
     private void init() {
         usersList.add(new User(100, "Klyuev Vlad", "Dev"));
         usersList.add(new User(101, "Platonova Anna", "TA"));
-        tasksList.add(new Task(102, "Make Lab1", "Make good lab", new Date(17, 9, 22), new Date(17, 10, 3), 100));
+        tasksList.add(new Task(102, "Make Lab2", "Make good lab2", new Date(117, 9, 22), new Date(117, 10, 3), 100));
     }
     
     public static Storage getInstance() {

@@ -1,7 +1,7 @@
 package com.view;
 
 import com.controller.Storage;
-import com.model.User;
+import com.models.User;
 
 public class UserDialog extends javax.swing.JDialog {
     

@@ -1,7 +1,7 @@
 package com.view;
 
-import com.model.Task;
-import com.model.User;
+import com.models.Task;
+import com.models.User;
 import com.controller.Storage;
 import com.view.tableModel.UsersTableModel;
 import com.view.tableModel.TasksTableModel;
