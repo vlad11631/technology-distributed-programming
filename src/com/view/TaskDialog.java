@@ -11,37 +11,39 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
 public class TaskDialog extends javax.swing.JDialog {
-    
+
     private Task task;
-    private DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, new Locale("ru","RU")); 
+    private DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, new Locale("ru", "RU"));
 
     public TaskDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
-    
+
     //Показать диалог
     public void showDialog(Task task) {
         this.task = task;
-        
+
         //Создаём модель для ComboBox
         DefaultComboBoxModel<String> cbModel = new DefaultComboBoxModel<String>();
-        for(User u: Storage.getInstance().getUsersList()){
+        for (User u : Storage.getInstance().getUsersList()) {
             cbModel.addElement(u.getName());
         }
         userComboBox.setModel(cbModel);
         userComboBox.revalidate();
         userComboBox.repaint();
-        
+
         if (task != null) {
             //Если task != null, то заполняем поля значениями
             nameTextField.setText(task.getName());
             descriptionTextArea.setText(task.getDescription());
             createdDateTextField.setText(dateFormat.format(task.getCreatedDate()));
-            endDateTextField.setText(dateFormat.format(task.getEndDate()));
-            User currentUser = Storage.getInstance().getUsersList().getUserById(task.getUserId());
+            
+            String endDateText = (task.getEndDate() != null) ? dateFormat.format(task.getEndDate()) : "";
+            endDateTextField.setText(endDateText);
+            User currentUser = Storage.getInstance().getUserById(task.getUserId());
             if (currentUser != null) {
-                userComboBox.setSelectedItem(currentUser.getName());   
+                userComboBox.setSelectedItem(currentUser.getName());
             }
         } else {
             createdDateTextField.setText(dateFormat.format(new Date()));
@@ -77,7 +79,7 @@ public class TaskDialog extends javax.swing.JDialog {
 
         titleLabel.setText("Создание задачи");
 
-        nameLabel.setText("Название");
+        nameLabel.setText("Название*");
 
         descriptionLabel.setText("Описание");
 
@@ -117,15 +119,7 @@ public class TaskDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(30, 30, 30)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(descriptionLabel)
-                                .addGap(60, 60, 60)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(nameLabel)
-                                .addGap(61, 61, 61)
-                                .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(createdDateLabel)
@@ -139,12 +133,20 @@ public class TaskDialog extends javax.swing.JDialog {
                                     .addComponent(userComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(okButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(cancelButton))))
+                                .addGap(117, 117, 117)
+                                .addComponent(cancelButton))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(descriptionLabel)
+                                    .addComponent(nameLabel))
+                                .addGap(55, 55, 55)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(97, 97, 97)
                         .addComponent(titleLabel)))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -183,42 +185,50 @@ public class TaskDialog extends javax.swing.JDialog {
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         try {
-            if (task != null) {
-                Date createdDate = dateFormat.parse(createdDateTextField.getText());
-                Date endDate = dateFormat.parse(endDateTextField.getText());
+            if (nameTextField.getText().equals("")) {
+                throw new RuntimeException();
+            }
+
+            Date createdDate = dateFormat.parse(createdDateTextField.getText());
+            Date endDate = null;
+            if (!endDateTextField.getText().equals("")){
+                endDate = dateFormat.parse(endDateTextField.getText());
                 if (endDate.compareTo(createdDate) < 0) {
                     throw new IllegalArgumentException();
                 }
-                
+            }
+
+            long userId = 0;
+            int selectUserIndex = userComboBox.getSelectedIndex();
+            if (selectUserIndex >= 0) {
+                User user = Storage.getInstance().getUser(selectUserIndex);
+                userId = user.getId();
+            }
+
+            if (task != null) {
                 task.setName(nameTextField.getText());
                 task.setDescription(descriptionTextArea.getText());
                 task.setEndDate(endDate);
-                User user = Storage.getInstance().getUsersList().get(userComboBox.getSelectedIndex());
-                task.setUserId(user.getId());
-                
-                Storage.getInstance().editTask(task.getId(), task);
+                task.setUserId(userId);
+
+                Storage.getInstance().editTaskById(task.getId(), task);
             } else {
-                Date createdDate = dateFormat.parse(createdDateTextField.getText());
-                Date endDate = dateFormat.parse(endDateTextField.getText());
-                if (endDate.compareTo(createdDate) < 0) {
-                    throw new IllegalArgumentException();
-                }
-                
                 Task task = new Task();
                 task.setName(nameTextField.getText());
                 task.setDescription(descriptionTextArea.getText());
                 task.setCreatedDate(createdDate);
                 task.setEndDate(endDate);
-                User user = Storage.getInstance().getUsersList().get(userComboBox.getSelectedIndex());
-                task.setUserId(user.getId());
-                
+                task.setUserId(userId);
+
                 Storage.getInstance().addTask(task);
-            }       
+            }
             setVisible(false);
-        } catch(ParseException e) {
-           JOptionPane.showMessageDialog(this, "Пожалуйста, введите дату в формате ДД.ММ.ГГГГ", "Wrong values", JOptionPane.ERROR_MESSAGE);
-        } catch(IllegalArgumentException e) {
-           JOptionPane.showMessageDialog(this, "Возможно дата окончания раньше даты создания", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(this, "Пожалуйста, введите дату в формате ДД.ММ.ГГГГ", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Возможно дата окончания раньше даты создания", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        } catch (RuntimeException e) {
+            JOptionPane.showMessageDialog(this, "Заполните обязательные поля", "Wrong values", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_okButtonActionPerformed
 
@@ -226,53 +236,9 @@ public class TaskDialog extends javax.swing.JDialog {
         setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-
     //МЕТОД закрывает окно
     private void formWindowClosing(java.awt.event.WindowEvent evt) {
-        
-    }
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TaskDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(TaskDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(TaskDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(TaskDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
 
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                TaskDialog dialog = new TaskDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
