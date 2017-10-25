@@ -52,6 +52,13 @@ public class Storage implements java.io.Serializable{
     }
     
     public void removeUser(long id){
+        for(Task t: tasksList) {
+           if (t.getUserId() == id) {
+               t.setUserId(0);
+               return;
+           }
+        }
+        
         for(User u: usersList) {
            if (u.getId() == id) {
                usersList.remove(u);

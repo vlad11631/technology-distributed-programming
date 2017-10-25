@@ -1,12 +1,12 @@
 package com.view;
 
-import com.view.tableModel.UsersTableModel;
-import com.controller.Storage;
 import com.model.Task;
 import com.model.User;
+import com.controller.Storage;
+import com.view.tableModel.UsersTableModel;
 import com.view.tableModel.TasksTableModel;
 import java.awt.Frame;
-import view.StudentTableModel;
+import javax.swing.JOptionPane;
 
 public class MainFrame extends javax.swing.JFrame {
     
@@ -216,11 +216,22 @@ public class MainFrame extends javax.swing.JFrame {
             tasksTable.setModel(new TasksTableModel(storage.getTasksList(), storage.getUsersList()));
             tasksTable.revalidate();
             tasksTable.repaint();
+        } else {
+            JOptionPane.showMessageDialog(this, "Пожалуйста, выберите задачу", "Wrong values", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_editTaskButtonActionPerformed
 
     private void deleteTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteTaskButtonActionPerformed
-        // TODO add your handling code here:
+        int index = tasksTable.getSelectedRow();
+        if (index >= 0) {
+            Storage.getInstance().getTasksList().remove(index);
+            
+            tasksTable.setModel(new TasksTableModel(storage.getTasksList(), storage.getUsersList()));
+            tasksTable.revalidate();
+            tasksTable.repaint();
+        } else {
+            JOptionPane.showMessageDialog(this, "Пожалуйста, выберите задачу", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_deleteTaskButtonActionPerformed
 
     private void addUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUserButtonActionPerformed
@@ -242,6 +253,8 @@ public class MainFrame extends javax.swing.JFrame {
             usersTable.setModel(new UsersTableModel(storage.getUsersList()));
             usersTable.revalidate();
             usersTable.repaint();
+        } else {
+            JOptionPane.showMessageDialog(this, "Пожалуйста, выберите исполнителя", "Wrong values", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_editUserButtonActionPerformed
 
@@ -253,6 +266,8 @@ public class MainFrame extends javax.swing.JFrame {
             usersTable.setModel(new UsersTableModel(storage.getUsersList()));
             usersTable.revalidate();
             usersTable.repaint();
+        } else {
+            JOptionPane.showMessageDialog(this, "Пожалуйста, выберите исполнителя", "Wrong values", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_deleteUserButtonActionPerformed
 

@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 
 public class TaskDialog extends javax.swing.JDialog {
     
@@ -39,7 +40,9 @@ public class TaskDialog extends javax.swing.JDialog {
             createdDateTextField.setText(dateFormat.format(task.getCreatedDate()));
             endDateTextField.setText(dateFormat.format(task.getEndDate()));
             User currentUser = Storage.getInstance().getUsersList().getUserById(task.getUserId());
-            userComboBox.setSelectedItem(currentUser.getName());
+            if (currentUser != null) {
+                userComboBox.setSelectedItem(currentUser.getName());   
+            }
         } else {
             createdDateTextField.setText(dateFormat.format(new Date()));
         }
@@ -181,29 +184,42 @@ public class TaskDialog extends javax.swing.JDialog {
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         try {
             if (task != null) {
+                Date createdDate = dateFormat.parse(createdDateTextField.getText());
+                Date endDate = dateFormat.parse(endDateTextField.getText());
+                if (endDate.compareTo(createdDate) < 0) {
+                    throw new IllegalArgumentException();
+                }
+                
                 task.setName(nameTextField.getText());
                 task.setDescription(descriptionTextArea.getText());
-                task.setEndDate(dateFormat.parse(endDateTextField.getText()));
+                task.setEndDate(endDate);
                 User user = Storage.getInstance().getUsersList().get(userComboBox.getSelectedIndex());
                 task.setUserId(user.getId());
                 
                 Storage.getInstance().editTask(task.getId(), task);
             } else {
+                Date createdDate = dateFormat.parse(createdDateTextField.getText());
+                Date endDate = dateFormat.parse(endDateTextField.getText());
+                if (endDate.compareTo(createdDate) < 0) {
+                    throw new IllegalArgumentException();
+                }
+                
                 Task task = new Task();
                 task.setName(nameTextField.getText());
                 task.setDescription(descriptionTextArea.getText());
-                task.setCreatedDate(dateFormat.parse(createdDateTextField.getText()));
-                task.setEndDate(dateFormat.parse(endDateTextField.getText()));
+                task.setCreatedDate(createdDate);
+                task.setEndDate(endDate);
                 User user = Storage.getInstance().getUsersList().get(userComboBox.getSelectedIndex());
                 task.setUserId(user.getId());
                 
                 Storage.getInstance().addTask(task);
-            }
+            }       
+            setVisible(false);
         } catch(ParseException e) {
-           e.printStackTrace();
+           JOptionPane.showMessageDialog(this, "Пожалуйста, введите дату в формате ДД.ММ.ГГГГ", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        } catch(IllegalArgumentException e) {
+           JOptionPane.showMessageDialog(this, "Возможно дата окончания раньше даты создания", "Wrong values", JOptionPane.ERROR_MESSAGE);
         }
-       
-        setVisible(false);
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
