@@ -58,10 +58,10 @@ public class ClientsList {
             }
         }
 
-        editingUserIds.put(clientIndex, taskId);
+        editingTaskIds.put(clientIndex, taskId);
     }
 
     public void stopEditTask(int clientIndex) {
-        editingUserIds.remove(clientIndex);
+        editingTaskIds.remove(clientIndex);
     }
 }
