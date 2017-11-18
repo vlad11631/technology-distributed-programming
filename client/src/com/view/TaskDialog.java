@@ -1,8 +1,10 @@
 package com.view;
 
-import com.controller.Storage;
-import com.model.Task;
-import com.model.User;
+import com.controller.ClientStorage;
+import com.controller.ServerListener;
+import com.models.Task;
+import com.models.User;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -18,6 +20,7 @@ public class TaskDialog extends javax.swing.JDialog {
     public TaskDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
     //Показать диалог
@@ -26,7 +29,7 @@ public class TaskDialog extends javax.swing.JDialog {
 
         //Создаём модель для ComboBox
         DefaultComboBoxModel<String> cbModel = new DefaultComboBoxModel<String>();
-        for (User u : Storage.getInstance().getUsersList()) {
+        for (User u : ClientStorage.getInstance().getUsersList()) {
             cbModel.addElement(u.getName());
         }
         userComboBox.setModel(cbModel);
@@ -41,7 +44,7 @@ public class TaskDialog extends javax.swing.JDialog {
             
             String endDateText = (task.getEndDate() != null) ? dateFormat.format(task.getEndDate()) : "";
             endDateTextField.setText(endDateText);
-            User currentUser = Storage.getInstance().getUserById(task.getUserId());
+            User currentUser = ClientStorage.getInstance().getUser(task.getUserId());
             if (currentUser != null) {
                 userComboBox.setSelectedItem(currentUser.getName());
             }
@@ -186,7 +189,7 @@ public class TaskDialog extends javax.swing.JDialog {
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         try {
             if (nameTextField.getText().equals("")) {
-                throw new RuntimeException();
+                throw new IllegalArgumentException();
             }
 
             Date createdDate = dateFormat.parse(createdDateTextField.getText());
@@ -201,44 +204,49 @@ public class TaskDialog extends javax.swing.JDialog {
             long userId = 0;
             int selectUserIndex = userComboBox.getSelectedIndex();
             if (selectUserIndex >= 0) {
-                User user = Storage.getInstance().getUser(selectUserIndex);
+                User user = ClientStorage.getInstance().getUsersList().get(selectUserIndex);
                 userId = user.getId();
             }
 
-            if (task != null) {
-                task.setName(nameTextField.getText());
-                task.setDescription(descriptionTextArea.getText());
-                task.setEndDate(endDate);
-                task.setUserId(userId);
-
-                Storage.getInstance().editTaskById(task.getId(), task);
-            } else {
+            if (task == null) {
                 Task task = new Task();
                 task.setName(nameTextField.getText());
                 task.setDescription(descriptionTextArea.getText());
                 task.setCreatedDate(createdDate);
                 task.setEndDate(endDate);
                 task.setUserId(userId);
-
-                Storage.getInstance().addTask(task);
+                ServerListener.getInstance().createTask(task);
+            } else {
+                task.setName(nameTextField.getText());
+                task.setDescription(descriptionTextArea.getText());
+                task.setEndDate(endDate);
+                task.setUserId(userId);
+                ServerListener.getInstance().editTask(task);
             }
             setVisible(false);
         } catch (ParseException e) {
             JOptionPane.showMessageDialog(this, "Пожалуйста, введите дату в формате ДД.ММ.ГГГГ", "Wrong values", JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, "Возможно дата окончания раньше даты создания", "Wrong values", JOptionPane.ERROR_MESSAGE);
-        } catch (RuntimeException e) {
-            JOptionPane.showMessageDialog(this, "Заполните обязательные поля", "Wrong values", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Возможно дата окончания раньше даты создания или незаполнены обязательные поля", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Ошибка доступак серверу!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        try {
+            if (task != null) {
+                ServerListener.getInstance().stopEditTask(task);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Ошибка доступак серверу!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
         setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     //МЕТОД закрывает окно
     private void formWindowClosing(java.awt.event.WindowEvent evt) {
-
+        //Почему-то не вызывается
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

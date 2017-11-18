@@ -8,10 +8,11 @@ public class Message implements Serializable{
         ERROR, 
         LOAD_OBJECTS, 
         LOAD_OBJECT,       
-        CREATE_OBJECT,        
-        START_EDIT_OBJECT,
-        STOP_EDIT_OBJECT,
-        DELETE_OBJECT,
+        CREATE,        
+        START_EDIT,
+        STOP_EDIT,
+        EDIT,
+        DELETE,
         FINISH_SESSION
     }
     
@@ -42,6 +43,7 @@ public class Message implements Serializable{
         return data;
     }
     
+    @Override
     public String toString(){
         StringBuffer str = new StringBuffer();
         
@@ -60,17 +62,20 @@ public class Message implements Serializable{
                 case LOAD_OBJECT:
                     str.append("LOAD_OBJECT ");
                     break;
-                case CREATE_OBJECT:
-                    str.append("CREATE_OBJECT ");
+                case CREATE:
+                    str.append("CREATE ");
                     break;
-                case START_EDIT_OBJECT:
-                    str.append("START_EDIT_OBJECT ");
+                case START_EDIT:
+                    str.append("START_EDIT ");
                     break;
-                case STOP_EDIT_OBJECT:
-                    str.append("STOP_EDIT_OBJECT ");
+                case STOP_EDIT:
+                    str.append("STOP_EDIT ");
                     break;
-                case DELETE_OBJECT:
-                    str.append("DELETE_OBJECT ");
+                case EDIT:
+                    str.append("EDIT ");
+                    break;
+                case DELETE:
+                    str.append("DELETE ");
                     break;
                 case FINISH_SESSION:
                     str.append("FINISH_SESSION ");

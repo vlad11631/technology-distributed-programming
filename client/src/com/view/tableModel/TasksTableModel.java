@@ -1,9 +1,9 @@
 package com.view.tableModel;
 
-import com.model.Task;
-import com.model.TasksList;
-import com.model.User;
-import com.model.UsersList;
+import com.models.Task;
+import com.models.TasksList;
+import com.models.User;
+import com.models.UsersList;
 import java.text.DateFormat;
 import java.util.Locale;
 import javax.swing.table.DefaultTableModel;
@@ -25,6 +25,11 @@ public class TasksTableModel extends DefaultTableModel {
     }
 
     public TasksTableModel(TasksList tasksList, UsersList usersList) {
+        this.tasksList = tasksList;
+        this.usersList = usersList;
+    }
+
+    public void setData(TasksList tasksList, UsersList usersList) {
         this.tasksList = tasksList;
         this.usersList = usersList;
     }

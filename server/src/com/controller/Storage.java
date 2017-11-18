@@ -42,11 +42,11 @@ public class Storage implements java.io.Serializable{
     }
     
     public void editUser(long id, User user){
-        for(User u: usersList) {
-           if (u.getId() == id) {
-               u = user;
-               return;
-           } 
+        for (int i = 0; i < usersList.size(); i++) {
+            if (usersList.get(i).getId() == id) {
+                usersList.set(i, user);
+                return;
+            }
         }
         throw new IllegalArgumentException();
     }
@@ -82,11 +82,11 @@ public class Storage implements java.io.Serializable{
     }
     
     public void editTask(long id, Task task){
-        for(Task t: tasksList) {
-           if (t.getId() == id) {
-               t = task;
-               return;
-           } 
+        for (int i = 0; i < tasksList.size(); i++) {
+            if (tasksList.get(i).getId() == id) {
+                tasksList.set(i, task);
+                return;
+            }
         }
         throw new IllegalArgumentException();
     }

@@ -1,7 +1,7 @@
 package com.view.tableModel;
 
-import com.model.User;
-import com.model.UsersList;
+import com.models.User;
+import com.models.UsersList;
 import javax.swing.table.DefaultTableModel;
 
 public class UsersTableModel extends DefaultTableModel {
@@ -19,8 +19,8 @@ public class UsersTableModel extends DefaultTableModel {
        this.usersList = usersList;
     }
 
-    public UsersList getUsersList() {
-        return usersList;
+    public void setData(UsersList usersList) {
+        this.usersList = usersList;
     }
     
     @Override

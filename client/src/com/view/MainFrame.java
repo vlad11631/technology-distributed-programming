@@ -1,29 +1,60 @@
 package com.view;
 
-import com.model.Task;
-import com.model.User;
-import com.controller.Storage;
+import com.controller.ClientStorage;
+import com.controller.MessageHandler;
+import com.controller.ServerListener;
+import com.models.Task;
+import com.models.User;
 import com.view.tableModel.UsersTableModel;
 import com.view.tableModel.TasksTableModel;
 import java.awt.Frame;
-import java.io.FileNotFoundException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 public class MainFrame extends javax.swing.JFrame {
-    
-    UsersTableModel usersTableModel;
-    TasksTableModel tasksTableModel;
+
+    private final ServerListener server;
+    private ClientStorage storage;
+    private UsersTableModel usersTableModel;
+    private TasksTableModel tasksTableModel;
 
     public MainFrame() {
         initComponents();
-        
-        Storage storage = Storage.getInstance();
+
+        storage = ClientStorage.getInstance();
         usersTableModel = new UsersTableModel(storage.getUsersList());
         tasksTableModel = new TasksTableModel(storage.getTasksList(), storage.getUsersList());
         usersTable.setModel(usersTableModel);
         tasksTable.setModel(tasksTableModel);
+
+        //Add table listener update 
+        MessageHandler.getInstance().addUpdateUsersListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                usersTableModel.setData(storage.getUsersList());
+                usersTableModel.fireTableDataChanged();
+            }
+        });
+        MessageHandler.getInstance().addUpdateTasksListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tasksTableModel.setData(storage.getTasksList(), storage.getUsersList());
+                tasksTableModel.fireTableDataChanged();
+            }
+        });
+
+        //Conect to server
+        server = ServerListener.getInstance();
+        server.start();
+
+        try {
+            server.loadData();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Ошибка доступак серверу!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
     }
 
     /**
@@ -50,8 +81,6 @@ public class MainFrame extends javax.swing.JFrame {
         deleteUserButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        saveMenuItem = new javax.swing.JMenuItem();
-        loadMenuItem = new javax.swing.JMenuItem();
         exitMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -182,22 +211,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenu1.setText("Меню");
 
-        saveMenuItem.setText("Сохранение");
-        saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveMenuItemActionPerformed(evt);
-            }
-        });
-        jMenu1.add(saveMenuItem);
-
-        loadMenuItem.setText("Загрузка");
-        loadMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loadMenuItemActionPerformed(evt);
-            }
-        });
-        jMenu1.add(loadMenuItem);
-
         exitMenuItem.setText("Выход");
         exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -227,107 +240,72 @@ public class MainFrame extends javax.swing.JFrame {
     private void addTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTaskButtonActionPerformed
         TaskDialog dialog = new TaskDialog(new Frame(), true);
         dialog.showDialog(null);
-        
-        tasksTableModel.fireTableDataChanged();
     }//GEN-LAST:event_addTaskButtonActionPerformed
 
     private void editTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editTaskButtonActionPerformed
         int index = tasksTable.getSelectedRow();
-        if (index >= 0) {
-            Task task = Storage.getInstance().getTask(index);
-            TaskDialog dialog = new TaskDialog(new Frame(), true);
-            dialog.showDialog(task);
-            
-            tasksTableModel.fireTableDataChanged();
-        } else {
+        try {
+            if (index < 0) throw new IllegalArgumentException();
+            Task task = storage.getTasksList().get(index);
+            server.startEditTask(task);
+        } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите задачу", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Ошибка доступак серверу!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_editTaskButtonActionPerformed
 
     private void deleteTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteTaskButtonActionPerformed
         int index = tasksTable.getSelectedRow();
-        if (index >= 0) {
-            Storage.getInstance().removeTask(index);
-            
-            tasksTableModel.fireTableDataChanged();
-        } else {
+        try {
+            if (index < 0) throw new IllegalArgumentException();
+            Task task = storage.getTasksList().get(index);
+            server.deleteTask(task);
+        } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите задачу", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Ошибка доступак серверу!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_deleteTaskButtonActionPerformed
 
     private void addUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUserButtonActionPerformed
         UserDialog dialog = new UserDialog(new Frame(), true);
         dialog.showDialog(null);
-        
-        usersTableModel.fireTableDataChanged();
     }//GEN-LAST:event_addUserButtonActionPerformed
 
     private void editUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editUserButtonActionPerformed
         int index = usersTable.getSelectedRow();
-        if (index >= 0) {
-            User user = Storage.getInstance().getUser(index);
-            UserDialog dialog = new UserDialog(new Frame(), true);
-            dialog.showDialog(user);
-            
-            usersTableModel.fireTableDataChanged();
-        } else {
-            JOptionPane.showMessageDialog(this, "Пожалуйста, выберите исполнителя", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        try {
+            if (index < 0) throw new IllegalArgumentException();
+            User user = storage.getUsersList().get(index);
+            server.startEditUser(user);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Пожалуйста, выберите задачу", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Ошибка доступак серверу!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_editUserButtonActionPerformed
 
     private void deleteUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteUserButtonActionPerformed
         int index = usersTable.getSelectedRow();
-        if (index >= 0) {
-            Storage.getInstance().removeUser(index);
-            
-            usersTableModel.fireTableDataChanged();
-        } else {
+        try {
+            if (index < 0) throw new IllegalArgumentException();
+            User user = storage.getUsersList().get(index);
+            server.deleteUser(user);
+        } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите исполнителя", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Ошибка доступак серверу!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_deleteUserButtonActionPerformed
-
-    private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMenuItemActionPerformed
-        JFileChooser chooserFile = new JFileChooser();
-        chooserFile.setDialogType(JFileChooser.SAVE_DIALOG);
-        if (chooserFile.showSaveDialog(chooserFile) == JFileChooser.APPROVE_OPTION) {
-            try {
-                Storage.saveStorage(chooserFile.getSelectedFile().getAbsolutePath());
-            } catch (IOException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Ошибка сохранения", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }//GEN-LAST:event_saveMenuItemActionPerformed
-
-    private void loadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadMenuItemActionPerformed
-        JFileChooser chooserFile = new JFileChooser();
-        chooserFile.setDialogType(JFileChooser.OPEN_DIALOG);
-        if (chooserFile.showOpenDialog(chooserFile) == JFileChooser.APPROVE_OPTION) {
-            try {
-                Storage.loadStorage(chooserFile.getSelectedFile().getAbsolutePath());
-                
-                Storage storage = Storage.getInstance();
-                usersTableModel = new UsersTableModel(storage.getUsersList());
-                tasksTableModel = new TasksTableModel(storage.getTasksList(), storage.getUsersList());
-                usersTable.setModel(usersTableModel);
-                tasksTable.setModel(tasksTableModel);
-                tasksTableModel.fireTableDataChanged();
-                usersTableModel.fireTableDataChanged();
-                
-            } catch (FileNotFoundException e) {
-                JOptionPane.showMessageDialog(this, "Файл не найден", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(this, "Файл не открыт", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (ClassNotFoundException e) {
-                JOptionPane.showMessageDialog(this, "Файл не открыт", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }//GEN-LAST:event_loadMenuItemActionPerformed
 
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
         System.exit(0);
     }//GEN-LAST:event_exitMenuItemActionPerformed
-
+    
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {
+        //Почему-то не вызывается
+    }
     /**
      * @param args the command line arguments
      */
@@ -377,8 +355,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane;
-    private javax.swing.JMenuItem loadMenuItem;
-    private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JTable tasksTable;
     private javax.swing.JPanel usersPanel;
     private javax.swing.JTable usersTable;

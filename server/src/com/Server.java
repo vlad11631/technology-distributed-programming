@@ -6,8 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-public class Server {
-    
+public class Server {  
+    private static final int PORT = 5555;
     private static ClientsList clients;
 
 
@@ -16,7 +16,7 @@ public class Server {
             clients = ClientsList.getInstance();
             
             int clientIndex = 0;
-            ServerSocket serverSocket = new ServerSocket(5555);
+            ServerSocket serverSocket = new ServerSocket(PORT);
             System.out.println("Сервер запущен");
             while(true) {
                 try {

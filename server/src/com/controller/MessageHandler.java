@@ -33,20 +33,23 @@ public class MessageHandler {
             case LOAD_OBJECT:
                 response = loadObject(message);
                 break;
-            case CREATE_OBJECT:
-                response = createObject(message);
+            case CREATE:
+                response = create(message);
                 break;
-            case START_EDIT_OBJECT:
-                response = startEditObject(clientIndex, message);
+            case START_EDIT:
+                response = startEdit(clientIndex, message);
                 break;
-            case STOP_EDIT_OBJECT:
-                response = stopEditObject(clientIndex, message);
+            case STOP_EDIT:
+                response = stopEdit(clientIndex, message);
                 break;
-            case DELETE_OBJECT:
-                response = deleteObject(message);
+            case EDIT:
+                response = edit(clientIndex, message);
+                break;
+            case DELETE:
+                response = delete(clientIndex, message);
                 break;
             case FINISH_SESSION:
-                response = finishSession(message);
+                //response = finishSession(clientIndex, message);
                 break;
         }
         return response;
@@ -74,75 +77,102 @@ public class MessageHandler {
         return new Message(Message.TypeMessage.ERROR, message.getTypeObject(), null);
     } 
     
-    private Message createObject(Message message) {
+    private Message create(Message message) {
         if (message.getTypeObject() == Message.TypeObject.USER){
             User user = (User)message.getData();
             storage.addUser(user);
-            clients.updateClients(new Message(Message.TypeMessage.CREATE_OBJECT, Message.TypeObject.USER, user));
+            clients.updateClients(new Message(Message.TypeMessage.CREATE, Message.TypeObject.USER, user));
             return new Message(Message.TypeMessage.OK, Message.TypeObject.USER, null);            
         } else if (message.getTypeObject() == Message.TypeObject.TASK){
             Task task = (Task)message.getData();
             storage.addTask(task);
-            clients.updateClients(new Message(Message.TypeMessage.CREATE_OBJECT, Message.TypeObject.TASK, task));
+            clients.updateClients(new Message(Message.TypeMessage.CREATE, Message.TypeObject.TASK, task));
             return new Message(Message.TypeMessage.OK, Message.TypeObject.TASK, null);           
         }
         return new Message(Message.TypeMessage.ERROR, message.getTypeObject(), null);
     }
     
-    private Message startEditObject(int clientIndex, Message message) {
+    private Message startEdit(int clientIndex, Message message) {
         if (message.getTypeObject() == Message.TypeObject.USER){
             User user = (User)message.getData();
             try {
-                clients.startEditUser(clientIndex, user);
-                return new Message(Message.TypeMessage.OK, Message.TypeObject.USER, null);
+                clients.startEditUser(clientIndex, user.getId());
+                return new Message(Message.TypeMessage.START_EDIT, Message.TypeObject.USER, user);
             } catch (IllegalArgumentException e) {
-                return new Message(Message.TypeMessage.ERROR, Message.TypeObject.USER, null); 
+                return new Message(Message.TypeMessage.ERROR, Message.TypeObject.USER, "В данный момент редактирование невозможно!"); 
             }            
         } else if (message.getTypeObject() == Message.TypeObject.TASK){
             Task task = (Task)message.getData();
             try {
-                clients.startEditTask(clientIndex, task);
-                return new Message(Message.TypeMessage.OK, Message.TypeObject.TASK, null);
+                clients.startEditTask(clientIndex, task.getId());
+                return new Message(Message.TypeMessage.START_EDIT, Message.TypeObject.TASK, task);
             } catch (IllegalArgumentException e) {
-                return new Message(Message.TypeMessage.ERROR, Message.TypeObject.TASK, null); 
+                return new Message(Message.TypeMessage.ERROR, Message.TypeObject.TASK, "В данный момент редактирование невозможно!"); 
             }              
         }
         return new Message(Message.TypeMessage.ERROR, message.getTypeObject(), null);
     }
     
-    private Message stopEditObject(int clientIndex, Message message) {
+    private Message stopEdit(int clientIndex, Message message) {
+        if (message.getTypeObject() == Message.TypeObject.USER){
+            User user = (User)message.getData();
+            clients.stopEditUser(clientIndex);
+            return new Message(Message.TypeMessage.OK, Message.TypeObject.USER, null);            
+        } else if (message.getTypeObject() == Message.TypeObject.TASK){
+            Task task = (Task)message.getData();
+            clients.stopEditTask(clientIndex);
+            return new Message(Message.TypeMessage.OK, Message.TypeObject.TASK, null);           
+        }
+        return new Message(Message.TypeMessage.ERROR, message.getTypeObject(), null);
+    }
+    
+    private Message edit(int clientIndex, Message message) {
         if (message.getTypeObject() == Message.TypeObject.USER){
             User user = (User)message.getData();
             storage.editUser(user.getId(), user);
-            clients.stopEditUser(clientIndex, user);
-            clients.updateClients(new Message(Message.TypeMessage.STOP_EDIT_OBJECT, Message.TypeObject.USER, user));
+            clients.stopEditUser(clientIndex);
+            clients.updateClients(new Message(Message.TypeMessage.EDIT, Message.TypeObject.USER, user));
             return new Message(Message.TypeMessage.OK, Message.TypeObject.USER, null);            
         } else if (message.getTypeObject() == Message.TypeObject.TASK){
             Task task = (Task)message.getData();
             storage.editTask(task.getId(), task);
-            clients.stopEditTask(clientIndex, task);
-            clients.updateClients(new Message(Message.TypeMessage.STOP_EDIT_OBJECT, Message.TypeObject.TASK, task));
+            clients.stopEditTask(clientIndex);
+            clients.updateClients(new Message(Message.TypeMessage.EDIT, Message.TypeObject.TASK, task));
             return new Message(Message.TypeMessage.OK, Message.TypeObject.TASK, null);           
         }
         return new Message(Message.TypeMessage.ERROR, message.getTypeObject(), null);
     }
     
-    private Message deleteObject(Message message) {
+    private Message delete(int clientIndex, Message message) {
         if (message.getTypeObject() == Message.TypeObject.USER){
             User user = (User)message.getData();
-            storage.removeUser(user.getId());
-            clients.updateClients(new Message(Message.TypeMessage.DELETE_OBJECT, Message.TypeObject.USER, user));
-            return new Message(Message.TypeMessage.OK, Message.TypeObject.USER, null);            
+            try{
+                clients.startEditUser(clientIndex, user.getId());
+                storage.removeUser(user.getId());
+                clients.stopEditUser(clientIndex);
+                clients.updateClients(new Message(Message.TypeMessage.DELETE, Message.TypeObject.USER, user));
+                return new Message(Message.TypeMessage.OK, Message.TypeObject.USER, null); 
+            } catch(IllegalArgumentException e){
+               return new Message(Message.TypeMessage.ERROR, Message.TypeObject.USER, "В данный момент удаление невозможно!");  
+            }
         } else if (message.getTypeObject() == Message.TypeObject.TASK){
             Task task = (Task)message.getData();
-            storage.removeTask(task.getId());
-            clients.updateClients(new Message(Message.TypeMessage.DELETE_OBJECT, Message.TypeObject.TASK, task));
-            return new Message(Message.TypeMessage.OK, Message.TypeObject.TASK, null);           
+            try{
+                clients.startEditTask(clientIndex, task.getId());
+                storage.removeTask(task.getId());
+                clients.stopEditTask(clientIndex);
+                clients.updateClients(new Message(Message.TypeMessage.DELETE, Message.TypeObject.TASK, task));
+                return new Message(Message.TypeMessage.OK, Message.TypeObject.TASK, null); 
+            } catch(IllegalArgumentException e){
+               return new Message(Message.TypeMessage.ERROR, Message.TypeObject.TASK, "В данный момент удаление невозможно!");  
+            }
         }
         return new Message(Message.TypeMessage.ERROR, message.getTypeObject(), null);
     }
     
-    private Message finishSession(Message message) {
-        return new Message(Message.TypeMessage.ERROR, message.getTypeObject(), null);
+    private Message finishSession(int clientIndex, Message message) {
+        clients.stopEditUser(clientIndex);
+        clients.stopEditTask(clientIndex);
+        return new Message(Message.TypeMessage.OK, null, null);
     }
 }

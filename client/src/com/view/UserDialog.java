@@ -1,7 +1,9 @@
 package com.view;
 
-import com.controller.Storage;
-import com.model.User;
+import com.controller.ClientStorage;
+import com.controller.ServerListener;
+import com.models.User;
+import java.io.IOException;
 import javax.swing.JOptionPane;
 
 public class UserDialog extends javax.swing.JDialog {
@@ -11,6 +13,7 @@ public class UserDialog extends javax.swing.JDialog {
     public UserDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
     //Показать диалог
@@ -115,34 +118,44 @@ public class UserDialog extends javax.swing.JDialog {
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         try {
+            //Проверка данных
             if (nameTextField.getText().equals("")) {
-                throw new RuntimeException();
+                throw new IllegalArgumentException();
             }
 
             if (user == null) {
                 User user = new User();
                 user.setName(nameTextField.getText());
                 user.setPost(postTextField.getText());
-                Storage.getInstance().addUser(user);
+                ServerListener.getInstance().createUser(user);
             } else {
                 user.setName(nameTextField.getText());
                 user.setPost(postTextField.getText());
-                Storage.getInstance().editUserById(user.getId(), user);
+                ServerListener.getInstance().editUser(user);
             }
 
             setVisible(false);
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, "Заполните обязательные поля", "Wrong values", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Ошибка доступак серверу!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        try {
+            if (user != null) {
+                ServerListener.getInstance().stopEditUser(user);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Ошибка доступак серверу!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
         setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     //МЕТОД закрывает окно
     private void formWindowClosing(java.awt.event.WindowEvent evt) {
-
+        //Почему-то не вызывается
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

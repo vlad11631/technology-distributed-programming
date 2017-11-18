@@ -3,12 +3,12 @@ package com.models;
 import java.util.Date;
 
 public class Task implements java.io.Serializable {
-    
+
     private long id;
     private String name;
     private String description;
     private Date createdDate;
-    private Date endDate; 
+    private Date endDate;
     private long userId;
 
     public Task() {
@@ -22,7 +22,7 @@ public class Task implements java.io.Serializable {
         this.endDate = endDate;
         this.userId = userId;
     }
-    
+
     public Task(Task task) {
         id = task.id;
         name = task.name;
@@ -35,6 +35,7 @@ public class Task implements java.io.Serializable {
     public long getId() {
         return id;
     }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -42,6 +43,7 @@ public class Task implements java.io.Serializable {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -49,6 +51,7 @@ public class Task implements java.io.Serializable {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -56,6 +59,7 @@ public class Task implements java.io.Serializable {
     public Date getCreatedDate() {
         return createdDate;
     }
+
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
@@ -63,6 +67,7 @@ public class Task implements java.io.Serializable {
     public Date getEndDate() {
         return endDate;
     }
+
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
@@ -70,7 +75,21 @@ public class Task implements java.io.Serializable {
     public long getUserId() {
         return userId;
     }
+
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer str = new StringBuffer();
+        str.append("{Task ")
+                .append(id).append(", ")
+                .append(name).append(", ")
+                .append(description).append(", ")
+                .append(createdDate).append(", ")
+                .append(endDate).append(", ")
+                .append(userId).append("}");
+        return str.toString();
     }
 }

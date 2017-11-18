@@ -19,6 +19,7 @@ public class ClintListener extends Thread {
         this.outStream = new ObjectOutputStream(socket.getOutputStream());
         this.outStream.flush();
         this.inStream = new ObjectInputStream(socket.getInputStream());
+        System.out.println("Клиент " + clientIndex + ": Подключен");
     }
     
     public void run() {
@@ -29,13 +30,18 @@ public class ClintListener extends Thread {
                 if (message != null) {
                     Message response = messageHandler.handleMessage(clientIndex, message);
                     write(response);
+                    
+                    if (message.getTypeMessage() == Message.TypeMessage.FINISH_SESSION) {
+                        System.out.println("Клиент " + clientIndex + ": Отключен");
+                        break;    
+                    }
                 }
             } catch (IOException e) {
-                System.out.println("Клиент " + clientIndex + ": Ошибка соединения. Клиент отключён");
+                System.out.println("Клиент " + clientIndex + ": Ошибка соединения. Отключен");
                 break;
             }
             if (Thread.currentThread().isInterrupted()) {
-                System.out.println("Клиент " + clientIndex + ": Принудительно отключён клиент");
+                System.out.println("Клиент " + clientIndex + ": Принудительно отключён");
                 break;
             }
         }
@@ -47,6 +53,10 @@ public class ClintListener extends Thread {
             inStream.close();
             outStream.close();
             socket.close();
+            
+            ClientsList clients = ClientsList.getInstance();
+            clients.stopEditUser(clientIndex);
+            clients.stopEditTask(clientIndex);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,11 +69,11 @@ public class ClintListener extends Thread {
             Object object = inStream.readObject();
             if (object != null) {
                 message = (Message) object;
-                System.out.println("Принято сообщение " + message);
+                System.out.println("Клиент " + clientIndex + ": Принято сообщение " + message);
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            System.out.println("Получено сообщение неизвестного формата");
+            System.out.println("Клиент " + clientIndex + ": Получено сообщение неизвестного формата");
 
         }
         return message;
@@ -73,7 +83,7 @@ public class ClintListener extends Thread {
     public void write(Message message) throws IOException {
         outStream.writeObject(message);
         outStream.flush();
-        System.out.println("Отправлено сообщение " + message);
+        System.out.println("Клиент " + clientIndex + ": Отправлено сообщение " + message);
     }
 
     public void updateClient(Message message) {

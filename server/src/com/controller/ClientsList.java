@@ -1,8 +1,6 @@
 package com.controller;
 
 import com.models.Message;
-import com.models.Task;
-import com.models.User;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -36,41 +34,34 @@ public class ClientsList {
         }
     }
     
-    public void startEditUser(int clientIndex, User user) {
+    //Наложение/снятиеблокировок
+    public void startEditUser(int clientIndex, long userId) {
         for (Integer key : editingUserIds.keySet()) {
             long editingUserId = editingUserIds.get(key);
-            if (editingUserId == user.getId()) {
+            if (editingUserId == userId) {
                 throw new IllegalArgumentException();
             }
         }
 
-        editingUserIds.put(clientIndex, user.getId());
+        editingUserIds.put(clientIndex, userId);
     }
 
-    public void stopEditUser(int clientIndex, User user) {
-        if (user.getId() != editingUserIds.get(clientIndex)) {
-            throw new IllegalArgumentException();
-        }
-
+    public void stopEditUser(int clientIndex) {
         editingUserIds.remove(clientIndex);
     }
 
-    public void startEditTask(int clientIndex, Task task) {
+    public void startEditTask(int clientIndex, long taskId) {
         for (Integer key : editingTaskIds.keySet()) {
             long editingTaskId = editingTaskIds.get(key);
-            if (editingTaskId == task.getId()) {
+            if (editingTaskId == taskId) {
                 throw new IllegalArgumentException();
             }
         }
 
-        editingUserIds.put(clientIndex, task.getId());
+        editingUserIds.put(clientIndex, taskId);
     }
 
-    public void stopEditTask(int clientIndex, Task task) {
-        if (task.getId() != editingUserIds.get(clientIndex)) {
-            throw new IllegalArgumentException();
-        }
-
+    public void stopEditTask(int clientIndex) {
         editingUserIds.remove(clientIndex);
     }
 }
