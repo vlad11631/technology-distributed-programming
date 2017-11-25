@@ -1,4 +1,4 @@
-package com.controller;
+package com.controllers;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

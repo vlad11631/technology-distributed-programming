@@ -1,6 +1,6 @@
-package com.view;
+package com.views;
 
-import com.controller.ServerListener;
+import com.controllers.ServerListener;
 import com.models.User;
 import java.io.IOException;
 import javax.swing.JOptionPane;

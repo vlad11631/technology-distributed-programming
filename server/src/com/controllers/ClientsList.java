@@ -1,4 +1,4 @@
-package com.controller;
+package com.controllers;
 
 import com.models.Message;
 import java.io.IOException;

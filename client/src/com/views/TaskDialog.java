@@ -1,7 +1,7 @@
-package com.view;
+package com.views;
 
-import com.controller.ClientStorage;
-import com.controller.ServerListener;
+import com.controllers.ClientStorage;
+import com.controllers.ServerListener;
 import com.models.Task;
 import com.models.User;
 import java.io.IOException;

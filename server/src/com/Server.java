@@ -1,6 +1,6 @@
 package com;
 
-import com.controller.ClientsList;
+import com.controllers.ClientsList;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;

@@ -1,12 +1,12 @@
-package com.view;
+package com.views;
 
-import com.controller.ClientStorage;
-import com.controller.MessageHandler;
-import com.controller.ServerListener;
+import com.controllers.ClientStorage;
+import com.controllers.MessageHandler;
+import com.controllers.ServerListener;
 import com.models.Task;
 import com.models.User;
-import com.view.tableModel.UsersTableModel;
-import com.view.tableModel.TasksTableModel;
+import com.views.tableModels.UsersTableModel;
+import com.views.tableModels.TasksTableModel;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
