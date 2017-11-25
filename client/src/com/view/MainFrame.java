@@ -45,7 +45,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        //Conect to server
+        //Connect to server
         server = ServerListener.getInstance();
         server.start();
 

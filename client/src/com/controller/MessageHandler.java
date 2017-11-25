@@ -66,9 +66,6 @@ public class MessageHandler {
             case LOAD_OBJECTS:
                 loadObjects(message);
                 break;
-            case LOAD_OBJECT:
-                //nothing
-                break;
             case CREATE:
                 create(message);
                 break;
@@ -149,21 +146,4 @@ public class MessageHandler {
             invokeUpdateTasks(message);          
         }
     }
-
-    /*private void update(Message message){
-        invokeUpdate(message);
-    }
-    
-    private void startEdit(Message message){
-        if (message.getTypeObject() == Message.TypeObject.TEACHER){
-            Teacher teacher = (Teacher)message.getData();
-            TeacherDialog dialog = new TeacherDialog(new Frame(), true);
-            dialog.showDialog(teacher);
-        }
-        if (message.getTypeObject() == Message.TypeObject.STUDENT){
-            Student student = (Student)message.getData();
-            StudentDialog dialog = new StudentDialog(new Frame(), true);
-            dialog.showDialog(student);
-        } 
-    }*/
 }

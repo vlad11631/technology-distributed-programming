@@ -115,11 +115,9 @@ public class MessageHandler {
     
     private Message stopEdit(int clientIndex, Message message) {
         if (message.getTypeObject() == Message.TypeObject.USER){
-            User user = (User)message.getData();
             clients.stopEditUser(clientIndex);
             return new Message(Message.TypeMessage.OK, Message.TypeObject.USER, null);            
         } else if (message.getTypeObject() == Message.TypeObject.TASK){
-            Task task = (Task)message.getData();
             clients.stopEditTask(clientIndex);
             return new Message(Message.TypeMessage.OK, Message.TypeObject.TASK, null);           
         }

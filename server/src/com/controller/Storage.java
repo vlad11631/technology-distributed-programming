@@ -55,7 +55,6 @@ public class Storage implements java.io.Serializable{
         for(Task t: tasksList) {
            if (t.getUserId() == id) {
                t.setUserId(0);
-               return;
            }
         }
         

@@ -208,7 +208,13 @@ public class TaskDialog extends javax.swing.JDialog {
                 userId = user.getId();
             }
 
-            if (task == null) {
+            if (task != null) {
+                task.setName(nameTextField.getText());
+                task.setDescription(descriptionTextArea.getText());
+                task.setEndDate(endDate);
+                task.setUserId(userId);
+                ServerListener.getInstance().editTask(task);
+            } else {
                 Task task = new Task();
                 task.setName(nameTextField.getText());
                 task.setDescription(descriptionTextArea.getText());
@@ -216,12 +222,6 @@ public class TaskDialog extends javax.swing.JDialog {
                 task.setEndDate(endDate);
                 task.setUserId(userId);
                 ServerListener.getInstance().createTask(task);
-            } else {
-                task.setName(nameTextField.getText());
-                task.setDescription(descriptionTextArea.getText());
-                task.setEndDate(endDate);
-                task.setUserId(userId);
-                ServerListener.getInstance().editTask(task);
             }
             setVisible(false);
         } catch (ParseException e) {

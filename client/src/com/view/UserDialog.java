@@ -122,15 +122,15 @@ public class UserDialog extends javax.swing.JDialog {
                 throw new IllegalArgumentException();
             }
 
-            if (user == null) {
+            if (user != null) {
+                user.setName(nameTextField.getText());
+                user.setPost(postTextField.getText());
+                ServerListener.getInstance().editUser(user);
+            } else {
                 User user = new User();
                 user.setName(nameTextField.getText());
                 user.setPost(postTextField.getText());
                 ServerListener.getInstance().createUser(user);
-            } else {
-                user.setName(nameTextField.getText());
-                user.setPost(postTextField.getText());
-                ServerListener.getInstance().editUser(user);
             }
 
             setVisible(false);
