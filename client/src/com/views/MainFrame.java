@@ -246,7 +246,7 @@ public class MainFrame extends javax.swing.JFrame {
         int index = tasksTable.getSelectedRow();
         try {
             if (index < 0) throw new IllegalArgumentException();
-            Task task = storage.getTasksList().get(index);
+            Task task = storage.getTasksList().getTasks().get(index);
             server.startEditTask(task);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите задачу", "Wrong values", JOptionPane.ERROR_MESSAGE);
@@ -259,7 +259,7 @@ public class MainFrame extends javax.swing.JFrame {
         int index = tasksTable.getSelectedRow();
         try {
             if (index < 0) throw new IllegalArgumentException();
-            Task task = storage.getTasksList().get(index);
+            Task task = storage.getTasksList().getTasks().get(index);
             server.deleteTask(task);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите задачу", "Wrong values", JOptionPane.ERROR_MESSAGE);
@@ -277,7 +277,7 @@ public class MainFrame extends javax.swing.JFrame {
         int index = usersTable.getSelectedRow();
         try {
             if (index < 0) throw new IllegalArgumentException();
-            User user = storage.getUsersList().get(index);
+            User user = storage.getUsersList().getUsers().get(index);
             server.startEditUser(user);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите задачу", "Wrong values", JOptionPane.ERROR_MESSAGE);
@@ -290,7 +290,7 @@ public class MainFrame extends javax.swing.JFrame {
         int index = usersTable.getSelectedRow();
         try {
             if (index < 0) throw new IllegalArgumentException();
-            User user = storage.getUsersList().get(index);
+            User user = storage.getUsersList().getUsers().get(index);
             server.deleteUser(user);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, "Пожалуйста, выберите исполнителя", "Wrong values", JOptionPane.ERROR_MESSAGE);

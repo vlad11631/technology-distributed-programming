@@ -1,54 +1,74 @@
 package com.models;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
-public class Message implements Serializable{
+@XmlRootElement(name = "Message")
+@XmlSeeAlso({User.class, UsersList.class, Task.class, TasksList.class})
+public class Message implements Serializable {
+
     public static enum TypeMessage {
         OK,
-        ERROR, 
-        LOAD_OBJECTS, 
-        LOAD_OBJECT,       
-        CREATE,        
+        ERROR,
+        LOAD_OBJECTS,
+        LOAD_OBJECT,
+        CREATE,
         START_EDIT,
         STOP_EDIT,
         EDIT,
         DELETE,
         FINISH_SESSION
     }
-    
+
     public static enum TypeObject {
         USER,
         TASK
     }
-    
-    private final TypeMessage typeMessage;
-    private final TypeObject typeObject;
-    private final Object data;
-    
+
+    private TypeMessage typeMessage;
+    private TypeObject typeObject;
+    private Object data;
+
+    public Message() {
+    }
+
     public Message(TypeMessage type, TypeObject target, Object data) {
         this.typeMessage = type;
         this.typeObject = target;
         this.data = data;
     }
-    
+
     public TypeMessage getTypeMessage() {
         return typeMessage;
+    }
+
+    public void setTypeMessage(TypeMessage typeMessage) {
+        this.typeMessage = typeMessage;
     }
 
     public TypeObject getTypeObject() {
         return typeObject;
     }
 
+    public void setTypeObject(TypeObject typeObject) {
+        this.typeObject = typeObject;
+    }
+
     public Object getData() {
         return data;
     }
-    
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
     @Override
-    public String toString(){
+    public String toString() {
         StringBuffer str = new StringBuffer();
-        
+
         //Записывем тип сообщения
-        if(typeMessage != null){
+        if (typeMessage != null) {
             switch (typeMessage) {
                 case OK:
                     str.append("OK ");
@@ -82,9 +102,9 @@ public class Message implements Serializable{
                     break;
             }
         }
-        
+
         //Записываем тип объекта
-        if (typeObject != null){
+        if (typeObject != null) {
             switch (typeObject) {
                 case USER:
                     str.append("USER ");
@@ -94,11 +114,11 @@ public class Message implements Serializable{
                     break;
             }
         }
-        
+
         //Записываем объект
-        if(data != null){
+        if (data != null) {
             str.append(data.toString());
         }
-    return str.toString();        
+        return str.toString();
     }
 }

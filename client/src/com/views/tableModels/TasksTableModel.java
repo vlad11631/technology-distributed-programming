@@ -37,7 +37,7 @@ public class TasksTableModel extends DefaultTableModel {
     @Override
     public int getRowCount() {
         if (tasksList != null) {
-            return tasksList.size();
+            return tasksList.getTasks().size();
         } else {
             return 0;
         }
@@ -60,7 +60,7 @@ public class TasksTableModel extends DefaultTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Task task = tasksList.get(rowIndex);
+        Task task = tasksList.getTasks().get(rowIndex);
         switch (columnIndex) {
             case 0:
                 return task.getName();

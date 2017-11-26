@@ -1,5 +1,8 @@
 package com.models;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "User")
 public class User implements java.io.Serializable {
 
     private long id;

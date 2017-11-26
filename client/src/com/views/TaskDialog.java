@@ -29,7 +29,7 @@ public class TaskDialog extends javax.swing.JDialog {
 
         //Создаём модель для ComboBox
         DefaultComboBoxModel<String> cbModel = new DefaultComboBoxModel<String>();
-        for (User u : ClientStorage.getInstance().getUsersList()) {
+        for (User u : ClientStorage.getInstance().getUsersList().getUsers()) {
             cbModel.addElement(u.getName());
         }
         userComboBox.setModel(cbModel);
@@ -204,7 +204,7 @@ public class TaskDialog extends javax.swing.JDialog {
             long userId = 0;
             int selectUserIndex = userComboBox.getSelectedIndex();
             if (selectUserIndex >= 0) {
-                User user = ClientStorage.getInstance().getUsersList().get(selectUserIndex);
+                User user = ClientStorage.getInstance().getUsersList().getUsers().get(selectUserIndex);
                 userId = user.getId();
             }
 

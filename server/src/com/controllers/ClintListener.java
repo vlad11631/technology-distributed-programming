@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
 import com.models.Message;
 
 public class ClintListener extends Thread {
@@ -21,7 +24,7 @@ public class ClintListener extends Thread {
         this.inStream = new ObjectInputStream(socket.getInputStream());
         System.out.println("Клиент " + clientIndex + ": Подключен");
     }
-    
+
     public void run() {
         MessageHandler messageHandler = MessageHandler.getInstance();
         while (true) {
@@ -30,14 +33,15 @@ public class ClintListener extends Thread {
                 if (message != null) {
                     Message response = messageHandler.handleMessage(clientIndex, message);
                     write(response);
-                    
+
                     if (message.getTypeMessage() == Message.TypeMessage.FINISH_SESSION) {
                         System.out.println("Клиент " + clientIndex + ": Отключен");
-                        break;    
+                        break;
                     }
                 }
             } catch (IOException e) {
                 System.out.println("Клиент " + clientIndex + ": Ошибка соединения. Отключен");
+                e.printStackTrace();
                 break;
             }
             if (Thread.currentThread().isInterrupted()) {
@@ -53,7 +57,7 @@ public class ClintListener extends Thread {
             inStream.close();
             outStream.close();
             socket.close();
-            
+
             ClientsList clients = ClientsList.getInstance();
             clients.stopEditUser(clientIndex);
             clients.stopEditTask(clientIndex);
@@ -68,22 +72,32 @@ public class ClintListener extends Thread {
         try {
             Object object = inStream.readObject();
             if (object != null) {
-                message = (Message) object;
+                message = JaxbHelper.fromXmlToMessage((Document) object);
                 System.out.println("Клиент " + clientIndex + ": Принято сообщение " + message);
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            System.out.println("Клиент " + clientIndex + ": Получено сообщение неизвестного формата");
-
+            throw new IOException();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+            throw new IOException();
         }
         return message;
     }
 
     //МЕТОД отправки сообщений на клиент
     public void write(Message message) throws IOException {
-        outStream.writeObject(message);
-        outStream.flush();
-        System.out.println("Клиент " + clientIndex + ": Отправлено сообщение " + message);
+        try {
+            outStream.writeObject(JaxbHelper.fromMessageToXml(message));
+            outStream.flush();
+            System.out.println("Клиент " + clientIndex + ": Отправлено сообщение " + message);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+            throw new IOException();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+            throw new IOException();
+        }
     }
 
     public void updateClient(Message message) {

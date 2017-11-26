@@ -25,7 +25,7 @@ public class UsersTableModel extends DefaultTableModel {
     
     @Override
     public int getRowCount() {
-        if (usersList != null) return usersList.size();
+        if (usersList != null) return usersList.getUsers().size();
         else return 0;
     }
 
@@ -46,7 +46,7 @@ public class UsersTableModel extends DefaultTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        User user = usersList.get(rowIndex);
+        User user = usersList.getUsers().get(rowIndex);
         switch (columnIndex) {
             case 0:
                 return user.getName();

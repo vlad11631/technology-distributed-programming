@@ -20,9 +20,9 @@ public class Storage implements java.io.Serializable{
     }
     
     private void init() {
-        usersList.add(new User(100, "Klyuev Vlad", "Dev"));
-        usersList.add(new User(101, "Platonova Anna", "TA"));
-        tasksList.add(new Task(102, "Make Lab2", "Make good lab2", new Date(117, 9, 22), new Date(117, 10, 3), 100));
+        usersList.getUsers().add(new User(100, "Klyuev Vlad", "Dev"));
+        usersList.getUsers().add(new User(101, "Platonova Anna", "TA"));
+        tasksList.getTasks().add(new Task(102, "Make Lab2", "Make good lab2", new Date(117, 9, 22), new Date(117, 10, 3), 100));
     }
     
     public static Storage getInstance() {
@@ -38,13 +38,13 @@ public class Storage implements java.io.Serializable{
     
     public void addUser(User user){
         user.setId(generationId());
-        usersList.add(user);
+        usersList.getUsers().add(user);
     }
     
     public void editUser(long id, User user){
-        for (int i = 0; i < usersList.size(); i++) {
-            if (usersList.get(i).getId() == id) {
-                usersList.set(i, user);
+        for (int i = 0; i < usersList.getUsers().size(); i++) {
+            if (usersList.getUsers().get(i).getId() == id) {
+                usersList.getUsers().set(i, user);
                 return;
             }
         }
@@ -52,15 +52,15 @@ public class Storage implements java.io.Serializable{
     }
     
     public void removeUser(long id){
-        for(Task t: tasksList) {
+        for(Task t: tasksList.getTasks()) {
            if (t.getUserId() == id) {
                t.setUserId(0);
            }
         }
         
-        for(User u: usersList) {
+        for(User u: usersList.getUsers()) {
            if (u.getId() == id) {
-               usersList.remove(u);
+               usersList.getUsers().remove(u);
                return;
            } 
         }
@@ -77,13 +77,13 @@ public class Storage implements java.io.Serializable{
     
     public void addTask(Task task){
         task.setId(generationId());
-        tasksList.add(task);
+        tasksList.getTasks().add(task);
     }
     
     public void editTask(long id, Task task){
-        for (int i = 0; i < tasksList.size(); i++) {
-            if (tasksList.get(i).getId() == id) {
-                tasksList.set(i, task);
+        for (int i = 0; i < tasksList.getTasks().size(); i++) {
+            if (tasksList.getTasks().get(i).getId() == id) {
+                tasksList.getTasks().set(i, task);
                 return;
             }
         }
@@ -91,9 +91,9 @@ public class Storage implements java.io.Serializable{
     }
     
     public void removeTask(long id){
-        for(Task t: tasksList) {
+        for(Task t: tasksList.getTasks()) {
            if (t.getId() == id) {
-               tasksList.remove(t);
+               tasksList.getTasks().remove(t);
                return;
            } 
         }
