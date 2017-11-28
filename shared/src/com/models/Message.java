@@ -12,7 +12,6 @@ public class Message implements Serializable {
         OK,
         ERROR,
         LOAD_OBJECTS,
-        LOAD_OBJECT,
         CREATE,
         START_EDIT,
         STOP_EDIT,
@@ -78,9 +77,6 @@ public class Message implements Serializable {
                     break;
                 case LOAD_OBJECTS:
                     str.append("LOAD_OBJECTS ");
-                    break;
-                case LOAD_OBJECT:
-                    str.append("LOAD_OBJECT ");
                     break;
                 case CREATE:
                     str.append("CREATE ");

@@ -78,7 +78,7 @@ public class ServerListener extends Thread {
         try {
             Object object = inStream.readObject();
             if (object != null) {
-                message = JaxbHelper.fromXmlToMessage((Document) object);
+                message = XmlHelper.fromXmlToMessage((Document) object);
                 System.out.println("Принято сообщение " + message);
             }
         } catch (ClassNotFoundException e) {
@@ -94,7 +94,7 @@ public class ServerListener extends Thread {
     //МЕТОД отправки сообщений на сервер
     private void write(Message message) throws IOException {
         try {
-            outStream.writeObject(JaxbHelper.fromMessageToXml(message));
+            outStream.writeObject(XmlHelper.fromMessageToXml(message));
             outStream.flush();
             System.out.println("Отправлено сообщение " + message);
         } catch (JAXBException e) {

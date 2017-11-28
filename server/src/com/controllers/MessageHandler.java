@@ -30,9 +30,6 @@ public class MessageHandler {
             case LOAD_OBJECTS:
                 response = loadObjects(message);
                 break;
-            case LOAD_OBJECT:
-                response = loadObject(message);
-                break;
             case CREATE:
                 response = create(message);
                 break;
@@ -60,19 +57,6 @@ public class MessageHandler {
             return new Message(Message.TypeMessage.LOAD_OBJECTS, Message.TypeObject.USER, storage.getUsersList());            
         } else if (message.getTypeObject() == Message.TypeObject.TASK){
             return new Message(Message.TypeMessage.LOAD_OBJECTS, Message.TypeObject.TASK, storage.getTasksList());            
-        }
-        return new Message(Message.TypeMessage.ERROR, message.getTypeObject(), null);
-    } 
-    
-    private Message loadObject(Message message) {
-        if (message.getTypeObject() == Message.TypeObject.USER){
-            User user = (User)message.getData();
-            User newUser = storage.getUser(user.getId());
-            return new Message(Message.TypeMessage.LOAD_OBJECT, Message.TypeObject.USER, newUser);            
-        } else if (message.getTypeObject() == Message.TypeObject.TASK){
-            Task task = (Task)message.getData();
-            Task newTask = storage.getTask(task.getId());
-            return new Message(Message.TypeMessage.LOAD_OBJECT, Message.TypeObject.TASK, newTask);            
         }
         return new Message(Message.TypeMessage.ERROR, message.getTypeObject(), null);
     } 

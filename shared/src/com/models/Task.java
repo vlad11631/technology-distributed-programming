@@ -3,7 +3,7 @@ package com.models;
 import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "Task")
+@XmlRootElement(name = "task")
 public class Task implements java.io.Serializable {
 
     private long id;

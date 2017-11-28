@@ -2,7 +2,7 @@ package com.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "User")
+@XmlRootElement(name = "user")
 public class User implements java.io.Serializable {
 
     private long id;
