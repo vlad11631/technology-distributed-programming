@@ -1,6 +1,5 @@
 package com.controllers;
 
-import com.models.Message;
 import com.models.Task;
 import com.models.TasksList;
 import com.models.User;
@@ -21,25 +20,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class XmlHelper {
-
-    public static Document fromMessageToXml(Message message) throws JAXBException, ParserConfigurationException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.newDocument();
-
-        JAXBContext context = JAXBContext.newInstance(Message.class);
-        Marshaller marshaller = context.createMarshaller();
-        // устанавливаем флаг для читабельного вывода XML в JAXB
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.marshal(message, doc);
-        return doc;
-    }
-
-    public static Message fromXmlToMessage(Document document) throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(Message.class);
-        Unmarshaller un = jaxbContext.createUnmarshaller();
-        return (Message) un.unmarshal(document);
-    }
    
     public static Document fromObjectToXml(Object object) throws JAXBException, ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -104,7 +84,6 @@ public class XmlHelper {
     }
 
     public static Document removeUser(Document document, long userId) throws ParserConfigurationException {
-
         Element usersElement = (Element) document.getElementsByTagName("users").item(0);
         NodeList nodeList = document.getElementsByTagName("user");
         for (int i = 0; i < nodeList.getLength(); i++) {

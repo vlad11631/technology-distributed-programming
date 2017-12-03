@@ -4,7 +4,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-@XmlRootElement(name = "Message")
+@XmlRootElement(name = "message")
 @XmlSeeAlso({User.class, UsersList.class, Task.class, TasksList.class})
 public class Message implements Serializable {
 

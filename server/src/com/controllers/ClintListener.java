@@ -72,7 +72,7 @@ public class ClintListener extends Thread {
         try {
             Object object = inStream.readObject();
             if (object != null) {
-                message = XmlHelper.fromXmlToMessage((Document) object);
+                message = (Message) XmlHelper.fromXmlToObject((Document) object, Message.class);
                 System.out.println("Клиент " + clientIndex + ": Принято сообщение " + message);
             }
         } catch (ClassNotFoundException e) {
@@ -88,7 +88,7 @@ public class ClintListener extends Thread {
     //МЕТОД отправки сообщений на клиент
     public void write(Message message) throws IOException {
         try {
-            outStream.writeObject(XmlHelper.fromMessageToXml(message));
+            outStream.writeObject(XmlHelper.fromObjectToXml(message));
             outStream.flush();
             System.out.println("Клиент " + clientIndex + ": Отправлено сообщение " + message);
         } catch (JAXBException e) {

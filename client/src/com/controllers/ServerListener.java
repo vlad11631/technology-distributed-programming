@@ -78,13 +78,10 @@ public class ServerListener extends Thread {
         try {
             Object object = inStream.readObject();
             if (object != null) {
-                message = XmlHelper.fromXmlToMessage((Document) object);
+                message = (Message) XmlHelper.fromXmlToObject((Document) object, Message.class);
                 System.out.println("Принято сообщение " + message);
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new IOException();
-        } catch (JAXBException e) {
+        } catch (ClassNotFoundException | JAXBException e) {
             e.printStackTrace();
             throw new IOException();
         }
@@ -94,13 +91,10 @@ public class ServerListener extends Thread {
     //МЕТОД отправки сообщений на сервер
     private void write(Message message) throws IOException {
         try {
-            outStream.writeObject(XmlHelper.fromMessageToXml(message));
+            outStream.writeObject(XmlHelper.fromObjectToXml(message));
             outStream.flush();
             System.out.println("Отправлено сообщение " + message);
-        } catch (JAXBException e) {
-            e.printStackTrace();
-            throw new IOException();
-        } catch (ParserConfigurationException e) {
+        } catch (ParserConfigurationException | JAXBException e) {
             e.printStackTrace();
             throw new IOException();
         }
