@@ -22,8 +22,8 @@ public class ClientsList {
         return instance;
     }
 
-    public void addClient(Integer clientIndex, Socket soket) throws IOException {
-        ClintListener client = new ClintListener(clientIndex, soket);
+    public void addClient(Integer clientIndex, Socket soket, Storage storage) throws IOException {
+        ClintListener client = new ClintListener(clientIndex, soket, storage);
         clients.add(client);
         client.start();
     }

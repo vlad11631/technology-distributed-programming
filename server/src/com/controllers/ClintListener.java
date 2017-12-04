@@ -1,5 +1,6 @@
 package com.controllers;
 
+import com.db.ConnectionJdbc;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -8,16 +9,22 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import com.models.Message;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClintListener extends Thread {
 
     private final int clientIndex;
+    private final Storage storage;
+    private final MessageHandler messageHandler;
     private final Socket socket;
     private final ObjectOutputStream outStream;
     private final ObjectInputStream inStream;
 
-    public ClintListener(int clientIndex, Socket socket) throws IOException {
+    public ClintListener(int clientIndex, Socket socket, Storage storage) throws IOException {
         this.clientIndex = clientIndex;
+        this.storage = storage;
+        this.messageHandler = new MessageHandler(storage);
         this.socket = socket;
         this.outStream = new ObjectOutputStream(socket.getOutputStream());
         this.outStream.flush();
@@ -26,7 +33,6 @@ public class ClintListener extends Thread {
     }
 
     public void run() {
-        MessageHandler messageHandler = MessageHandler.getInstance();
         while (true) {
             try {
                 Message message = read();

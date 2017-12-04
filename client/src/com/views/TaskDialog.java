@@ -201,7 +201,7 @@ public class TaskDialog extends javax.swing.JDialog {
                 }
             }
 
-            long userId = 0;
+            int userId = 0;
             int selectUserIndex = userComboBox.getSelectedIndex();
             if (selectUserIndex >= 0) {
                 User user = ClientStorage.getInstance().getUsersList().getUsers().get(selectUserIndex);

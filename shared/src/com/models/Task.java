@@ -6,17 +6,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "task")
 public class Task implements java.io.Serializable {
 
-    private long id;
+    private int id;
     private String name;
     private String description;
     private Date createdDate;
     private Date endDate;
-    private long userId;
+    private int userId;
 
     public Task() {
     }
 
-    public Task(long id, String name, String description, Date createdDate, Date endDate, long userId) {
+    public Task(int id, String name, String description, Date createdDate, Date endDate, int userId) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -34,11 +34,11 @@ public class Task implements java.io.Serializable {
         userId = task.userId;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -74,11 +74,11 @@ public class Task implements java.io.Serializable {
         this.endDate = endDate;
     }
 
-    public long getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

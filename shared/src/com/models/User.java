@@ -5,14 +5,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "user")
 public class User implements java.io.Serializable {
 
-    private long id;
+    private int id;
     private String name;
     private String post;
 
     public User() {
     }
 
-    public User(long id, String name, String post) {
+    public User(int id, String name, String post) {
         this.id = id;
         this.name = name;
         this.post = post;
@@ -24,11 +24,11 @@ public class User implements java.io.Serializable {
         post = user.post;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
