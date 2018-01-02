@@ -1,0 +1,31 @@
+CREATE TABLE Users(	
+  id integer PRIMARY KEY,
+  name char(30) NOT NULL,
+  post char(30)
+);
+
+CREATE TABLE Tasks(	
+  id integer PRIMARY KEY,
+  name char(30) NOT NULL,
+  description char(200),
+  createdDate Date NOT NULL,
+  endDate Date,
+  userId integer,
+  FOREIGN KEY (userId) REFERENCES Users(id)
+);
+
+CREATE SEQUENCE Seq_id MINVALUE 60;
+
+INSERT INTO Users(id, name, post) VALUES (50, 'Vlad', 'Dev');
+INSERT INTO Users(id, name, post) VALUES (51, 'Anna', 'QA');
+INSERT INTO Users(id, name, post) VALUES (52, 'Dima', 'Dev');
+INSERT INTO Users(id, name, post) VALUES (53, 'Masha', 'QA');
+INSERT INTO Users(id, name, post) VALUES (54, 'Oleg', 'Dev');
+INSERT INTO Users(id, name, post) VALUES (NEXTVAL('Seq_id'), 'Alina', 'QA');
+
+INSERT INTO Tasks(id, name, description, createdDate, endDate, userId) VALUES (55, 'Lab1', 'To do lab1', '11-11-2017', '12-12-2017', 50);
+INSERT INTO Tasks(id, name, description, createdDate, endDate, userId) VALUES (56, 'Lab2', 'To do lab2', '11-11-2017', '12-12-2017', 51);
+INSERT INTO Tasks(id, name, description, createdDate, endDate, userId) VALUES (57, 'Lab3', 'To do lab3', '11-11-2017', '12-12-2017', 52);
+INSERT INTO Tasks(id, name, description, createdDate, endDate, userId) VALUES (58, 'Lab4', 'To do lab4', '11-11-2017', '12-12-2017', 53);
+INSERT INTO Tasks(id, name, description, createdDate, endDate, userId) VALUES (59, 'Lab5', 'To do lab5', '11-11-2017', '12-12-2017', 54);
+INSERT INTO Tasks(id, name, description, createdDate, endDate, userId) VALUES (NEXTVAL('Seq_id'), 'Lab6', 'To do lab6', '11-11-2017', '12-12-2017', 54);
